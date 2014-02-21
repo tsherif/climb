@@ -1,6 +1,4 @@
 node_modules
 production
-audio
+audio/bellahmer*
 fonts
-js/oFactory.min.js
-js/tgame.min.js

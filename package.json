@@ -1,5 +1,5 @@
 {
-  "name": "climb",
+  "name": "Climb",
   "version": "1.0.1",
   "repository": {
     "type": "git",
@@ -10,7 +10,7 @@
     "email": "tsherif@gmail.com",
     "url": "http://tareksherif.ca/"
   },
-  "license": "GNU Affero GPL v3",
+  "license": "GNU Affero GPL 3.0",
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-contrib-jshint": "~0.8.0",

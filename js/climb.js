@@ -1,5 +1,5 @@
 /*
-* climb
+* Climb
 * 
 * Copyright (C) 2014 Tarek Sherif 
 * 
