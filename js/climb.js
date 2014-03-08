@@ -167,7 +167,7 @@
 
       tgame.effects.fade({
         objects: [title_message, author_message, music_message],
-        ratio: 0.95,
+        multiplier: 0.95,
         delay: 1000,
         remove: true,
         complete: function() {
@@ -177,12 +177,12 @@
           jump_message.alpha = 0;
           tgame.effects.fade({
             objects: [controls_message, jump_message],
-            ratio: 1.4,
+            multiplier: 1.4,
             complete: function() {
               jump_message.hidden = false;
               tgame.effects.fade({
                 objects: [controls_message, jump_message],
-                ratio: 0.95,
+                multiplier: 0.95,
                 delay: 3200,
                 remove: true
               });

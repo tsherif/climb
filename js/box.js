@@ -22,7 +22,6 @@
 
   window.createBox = oFactory({
     draw: function(context) {
-      context.save();
       context.translate(this.x + this.width / 2, this.y + this.height / 2);
       context.rotate(this.rotation);
       context.scale(this.scale_x, this.scale_y);
@@ -35,7 +34,6 @@
       if (this.lineWidth > 0) {
         context.stroke();
       }
-      context.restore();
     }
   }).mixin({
     color: "#FFFFFF",

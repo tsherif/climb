@@ -22,14 +22,12 @@
 
   window.createMessage = oFactory({
     draw: function(context) {
-      context.save();
       context.globalAlpha = this.alpha;
       context.font = this.font;
       context.fillStyle = this.color;
       context.textAlign = this.text_align;
       context.textBaseline = this.baseline;
       context.fillText(this.text, this.x, this.y);
-      context.restore();
     }
   }).mixin({
     font: "bold 40px Helvetica",

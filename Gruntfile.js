@@ -18,7 +18,7 @@ module.exports = function(grunt) {
           "js/message.js",
           "js/climb.js"
         ],
-        dest: "production/js/<%= pkg.name %>.min.js"
+        dest: "production/js/climb.min.js"
       }
     },
     jshint: {
