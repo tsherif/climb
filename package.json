@@ -1,6 +1,6 @@
 {
   "name": "Climb",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/tsherif/climb.git"
@@ -14,7 +14,7 @@
   "scripts": {
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "minify": "node build-banner.js > build/tgame.min.js && terser src/tgame.js src/tgame.*.js -c -m >> build/tgame.min.js",
+    "minify": "mkdir -p production/js && node build-banner.js > production/js/climb.min.js && terser js/box.js js/player.js js/platform.js js/message.js js/climb.js -c -m >> production/js/climb.min.js",
     "build": "npm run lint && npm run minify"
   },
   "devDependencies": {
