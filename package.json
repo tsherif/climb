@@ -11,9 +11,16 @@
     "url": "http://tareksherif.ca/"
   },
   "license": "GNU Affero GPL 3.0",
+  "scripts": {
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "minify": "node build-banner.js > build/tgame.min.js && terser src/tgame.js src/tgame.*.js -c -m >> build/tgame.min.js",
+    "build": "npm run lint && npm run minify"
+  },
   "devDependencies": {
-    "grunt": "~0.4.2",
-    "grunt-contrib-jshint": "~0.8.0",
-    "grunt-contrib-uglify": "~0.3.2"
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "globals": "^17.3.0",
+    "terser": "^5.46.0"
   }
 }

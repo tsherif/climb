@@ -1,25 +1,25 @@
 /*
 * Climb
-* 
-* Copyright (C) 2014 Tarek Sherif 
-* 
+*
+* Copyright (C) 2014 Tarek Sherif
+*
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
-* 
+*
 * This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Affero General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Affero General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 (function() {
   "use strict";
-  
+
   window.createPlatform = createBox.clone().share({
     translate: function(x_offset, y_offset) {
       this.x += x_offset;
@@ -37,7 +37,7 @@
     updatePosition: function(time) {
       this.last_x = this.x;
       this.last_y = this.y;
-      
+
       if (this.range_x){
         this.x = this.origin_x + Math.sin(time / 1000) * this.range_x;
       } else {

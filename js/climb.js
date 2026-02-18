@@ -1,18 +1,18 @@
 /*
 * Climb
-* 
-* Copyright (C) 2014 Tarek Sherif 
-* 
+*
+* Copyright (C) 2014 Tarek Sherif
+*
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License as
 * published by the Free Software Foundation, either version 3 of the
 * License, or (at your option) any later version.
-* 
+*
 * This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Affero General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Affero General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -27,7 +27,8 @@
   var GRAVITY = 1.4;
   var FRICTION = 0.7;
   var TERMINAL_VX = 7;
-  var JUMP = -25;
+  var JUMP = -25; 
+  var MS_TO_FRAMES = 40 / 1000;
 
   var LEVEL_WIDTH = 650;
   var FLOOR_HEIGHT = 75;
@@ -46,8 +47,6 @@
   var title_message, start_message, game_over_message, score_message, hi_score_message, restart_message;
 
   var camera_movement = 0;
-
-  tgame.setFPS(40);
 
   tgame.clear_color = "#000000";
 
@@ -228,7 +227,7 @@
 
       tgame.state = "START_ROUND";
     },
-    
+
     CLEAR_ROUND: function() {
       tgame.clearEntities();
 
@@ -292,7 +291,7 @@
           world.left,
           world.right,
           world.bottom - FLOOR_HEIGHT
-          )
+        )
         );
       }
 
@@ -365,13 +364,14 @@
       tgame.state = "PLAY";
     },
 
-    PLAY: function() {
+    PLAY: function(dt) {
+      var df = dt * MS_TO_FRAMES;
       var collisions = {};
 
       player.last_x = player.x;
       player.last_y = player.y;
 
-      
+
       player.ax = 0;
 
       if (player.move_left && !player.move_right) {
@@ -392,17 +392,17 @@
       }
 
       if (player.ax) {
-        player.vx = Math.max(-TERMINAL_VX, Math.min(player.vx + player.ax, TERMINAL_VX));
+        player.vx = Math.max(-TERMINAL_VX, Math.min(player.vx + player.ax * df, TERMINAL_VX));
       } else if (player.onplatform) {
         player.vx = 0;
       } else {
-        player.vx *= FRICTION;
+        player.vx *= FRICTION * df;
       }
 
-      player.vy += GRAVITY;
+      player.vy += GRAVITY * df;
 
-      player.x += player.vx;
-      player.y += player.vy;
+      player.x += player.vx * df;
+      player.y += player.vy * df;
 
       player.animate();
 
@@ -456,7 +456,7 @@
             }
           }
         }
-        
+
       });
 
       resolveCollisions(player, collisions);
@@ -479,7 +479,7 @@
 
       max_height = Math.max(max_height, height);
       max_height_message.text = "Max height: " + max_height;
-      
+
       if (player.y > world.bottom + PLATFORM_DOUBLE_RANGE) {
         tgame.state = "OVER";
       }
@@ -570,7 +570,7 @@
         return false;
       };
     }
-    
+
     if (y_increment < 0) {
       conditionY = function(y) {
         return y > player_y;
@@ -750,7 +750,7 @@
         player.onplatform = bottom;
       }
     }
-    
+
   }
 
 })();
