@@ -21,8 +21,9 @@
   "use strict";
 
   var canvas = document.getElementById("canvas");
-  canvas.width = 800;
-  canvas.height = 600;
+
+  var WORLD_WIDTH = 800;
+  var WORLD_HEIGHT = 600;
 
   var GRAVITY = 1.4;
   var FRICTION = 0.7;
@@ -39,7 +40,7 @@
 
   var PLAYER_COLOR = "#FF0000";
   var PLATFORM_COLOR = "#0000FF";
-  var WALL_COLOR = "#070707";
+  var WALL_COLOR = "#101010";
 
   var player, world, border_width;
   var height, height_message;
@@ -56,6 +57,27 @@
     walls: [],
     messages: []
   };
+
+  function calculateProjection() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    var canvas_scale = canvas.width / WORLD_WIDTH;
+
+    if (canvas_scale * WORLD_HEIGHT > canvas.height) {
+      canvas_scale = canvas.height / WORLD_HEIGHT;
+    }
+
+    var canvas_offset_x = (canvas.width - canvas_scale * WORLD_WIDTH) * 0.5;
+    var canvas_offset_y = (canvas.height - canvas_scale * WORLD_HEIGHT) * 0.5;
+
+    tgame.setProjectionOffset(canvas_offset_x, canvas_offset_y);
+    tgame.setProjectionScale(canvas_scale);
+  }
+
+  calculateProjection();
+
+  window.addEventListener("resize", calculateProjection);
 
   tgame.setRenderOrder(["walls", "platforms", "player", "messages"]);
 
@@ -107,16 +129,54 @@
 
   tgame.setCanvas(canvas);
 
+  function createLevel() {
+    tgame.entities.walls.push(createPlatform({
+      x: 0,
+      y: 0,
+      width: border_width,
+      height: WORLD_HEIGHT,
+      color: WALL_COLOR
+    }));
+
+    tgame.entities.walls.push(createPlatform({
+      x: world.right,
+      y: 0,
+      width: border_width,
+      height: WORLD_HEIGHT,
+      color: WALL_COLOR
+    }));
+
+    tgame.entities.platforms.push(createPlatform({
+      x: 0,
+      y: WORLD_HEIGHT - FLOOR_HEIGHT,
+      width: WORLD_WIDTH,
+      height: FLOOR_HEIGHT,
+      color: WALL_COLOR
+    }));
+
+
+    var num_platforms = Math.floor(Math.random() * 60 + 30);
+    while (num_platforms--) {
+      tgame.entities.platforms.push(spawnPlatform(
+        Math.random() * (world.bottom - FLOOR_HEIGHT - PLATFORM_DIM + PLATFORM_DOUBLE_RANGE) - PLATFORM_DOUBLE_RANGE,
+        world.left,
+        world.right,
+        world.bottom - FLOOR_HEIGHT
+      )
+      );
+    }
+  }
+
   tgame.STATES = {
     INIT: function() {
-      border_width = (canvas.width - LEVEL_WIDTH) / 2;
+      border_width = (WORLD_WIDTH - LEVEL_WIDTH) / 2;
 
       world = {
         top: 0,
         left: border_width,
-        bottom: canvas.height,
-        right: canvas.width - border_width,
-        top_boundary: canvas.height * 0.25
+        bottom: WORLD_HEIGHT,
+        right: WORLD_WIDTH - border_width,
+        top_boundary: WORLD_HEIGHT * 0.25
       };
 
       title_message = createMessage({
@@ -141,11 +201,17 @@
       tgame.entities.messages.push(title_message);
       tgame.entities.messages.push(start_message);
 
+      createLevel();
+
       tgame.getCanvas().focus();
 
       tgame.state = "PRESS_START";
     },
-    PRESS_START: function() {},
+    PRESS_START: function() {
+      tgame.entities.platforms.forEach(function(platform) {
+        platform.updatePosition(Date.now());
+      });
+    },
     TITLE: function() {
       var author_message, music_message;
       var controls_message, jump_message;
@@ -231,17 +297,17 @@
     CLEAR_ROUND: function() {
       tgame.clearEntities();
 
+      createLevel();
+
       tgame.state = "START_ROUND";
     },
 
     START_ROUND: function() {
 
-      var num_platforms;
-
       player = createPlayer({
         color: PLAYER_COLOR,
-        x: canvas.width / 2,
-        y: canvas.height - FLOOR_HEIGHT - 30,
+        x: WORLD_WIDTH / 2,
+        y: WORLD_HEIGHT - FLOOR_HEIGHT - 30,
         width: 15,
         height: 30,
         vx: 0,
@@ -258,42 +324,6 @@
       });
 
       tgame.entities.player.push(player);
-
-      tgame.entities.walls.push(createPlatform({
-        x: 0,
-        y: 0,
-        width: border_width,
-        height: canvas.height,
-        color: WALL_COLOR
-      }));
-
-      tgame.entities.walls.push(createPlatform({
-        x: world.right,
-        y: 0,
-        width: border_width,
-        height: canvas.height,
-        color: WALL_COLOR
-      }));
-
-      tgame.entities.platforms.push(createPlatform({
-        x: 0,
-        y: canvas.height - FLOOR_HEIGHT,
-        width: canvas.width,
-        height: FLOOR_HEIGHT,
-        color: WALL_COLOR
-      }));
-
-
-      num_platforms = Math.floor(Math.random() * 60 + 30);
-      while (num_platforms--) {
-        tgame.entities.platforms.push(spawnPlatform(
-          Math.random() * (world.bottom - FLOOR_HEIGHT - PLATFORM_DIM + PLATFORM_DOUBLE_RANGE) - PLATFORM_DOUBLE_RANGE,
-          world.left,
-          world.right,
-          world.bottom - FLOOR_HEIGHT
-        )
-        );
-      }
 
       height = 0;
       height_message = createMessage({
@@ -416,7 +446,7 @@
 
       player.y += camera_movement;
 
-      if (camera_movement > 0 && Math.random() < PLATFORM_SPAWN) {
+      if (camera_movement > 0 && Math.random() < PLATFORM_SPAWN * df) {
         tgame.entities.platforms.push(spawnPlatform(world.top - PLATFORM_DOUBLE_RANGE, world.left, world.right));
       }
 
