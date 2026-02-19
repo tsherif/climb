@@ -45,7 +45,7 @@
   var player, world, border_width;
   var height, height_message;
   var max_height, max_height_message;
-  var title_message, start_message, game_over_message, score_message, hi_score_message, restart_message;
+  var title_message, start_message, fullscreen_message, game_over_message, score_message, hi_score_message, restart_message;
 
   var camera_movement = 0;
 
@@ -75,6 +75,23 @@
     tgame.setProjectionScale(canvas_scale);
   }
 
+  function checkStartPressed() {
+    if (tgame.state === "PRESS_START") {
+      tgame.state = 'TITLE';
+      start_message.remove = true;
+      fullscreen_message.remove = true;
+
+      tgame.sounds.music.currentTime = 0;
+      tgame.sounds.music.loop = true;
+      tgame.sounds.music.volume = 0.5;
+      tgame.sounds.music.play();
+
+      return true;
+    }
+
+    return false;
+  }
+
   calculateProjection();
 
   window.addEventListener("resize", calculateProjection);
@@ -93,16 +110,19 @@
     player.move_right = false;
   });
 
+  tgame.addKeyControl(tgame.keyboard.RIGHT, function() {
+    player.move_right = true;
+  }, function() {
+    player.move_right = false;
+  });
+
+  tgame.addKeyControl(tgame.keyboard.F, function() {
+    checkStartPressed();
+    tgame.toggleFullscreen();  
+  });
+
   tgame.addKeyControl(tgame.keyboard.SPACE, function() {
-    if (tgame.state === "PRESS_START") {
-      tgame.state = 'TITLE';
-      start_message.remove = true;
-
-      tgame.sounds.music.currentTime = 0;
-      tgame.sounds.music.loop = true;
-      tgame.sounds.music.volume = 0.5;
-      tgame.sounds.music.play();
-
+    if (checkStartPressed()) {
       return;
     }
 
@@ -198,8 +218,18 @@
         text: "Press SPACE to Start"
       });
 
+      fullscreen_message = createMessage({
+        x: title_message.x,
+        y: title_message.y + 96,
+        font: "normal 18px telegrama",
+        baseline: "top",
+        text_align: "center",
+        text: "F to Enter Fullscreen"
+      });
+
       tgame.entities.messages.push(title_message);
       tgame.entities.messages.push(start_message);
+      tgame.entities.messages.push(fullscreen_message);
 
       createLevel();
 
