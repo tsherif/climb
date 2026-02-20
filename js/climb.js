@@ -28,7 +28,7 @@
   var GRAVITY = 1.4;
   var FRICTION = 0.7;
   var TERMINAL_VX = 7;
-  var JUMP = -25; 
+  var JUMP = -25;
   var MS_TO_FRAMES = 40 / 1000;
 
   var LEVEL_WIDTH = 650;
@@ -42,10 +42,17 @@
   var PLATFORM_COLOR = "#0000FF";
   var WALL_COLOR = "#101010";
 
+  var GAMEPAD_JUMP_TEXT = "'A' to Jump";
+  var GAMEPAD_RESTART_TEXT = "Press 'Start' to Restart";
+  var KEYBOARD_JUMP_TEXT = "SPACE to Jump";
+  var KEYBOARD_RESTART_TEXT = "Press 'R' to Restart";
+
   var player, world, border_width;
   var height, height_message;
   var max_height, max_height_message;
-  var title_message, start_message, fullscreen_message, game_over_message, score_message, hi_score_message, restart_message;
+  var title_message, start_message, fullscreen_message, jump_message;
+  var game_over_message, score_message, hi_score_message, restart_message;
+  var using_gamepad = false;
 
   var camera_movement = 0;
 
@@ -92,6 +99,14 @@
     return false;
   }
 
+  function restart() {
+    game_over_message.hidden = true;
+    score_message.hidden = true;
+    hi_score_message.hidden = true;
+    restart_message.hidden = true;
+    tgame.state = "CLEAR_ROUND";
+  }
+
   calculateProjection();
 
   window.addEventListener("resize", calculateProjection);
@@ -99,18 +114,14 @@
   tgame.setRenderOrder(["walls", "platforms", "player", "messages"]);
 
   tgame.addKeyControl(tgame.keyboard.LEFT, function() {
+    using_gamepad = false;
     player.move_left = true;
   }, function() {
     player.move_left = false;
   });
 
   tgame.addKeyControl(tgame.keyboard.RIGHT, function() {
-    player.move_right = true;
-  }, function() {
-    player.move_right = false;
-  });
-
-  tgame.addKeyControl(tgame.keyboard.RIGHT, function() {
+    using_gamepad = false;
     player.move_right = true;
   }, function() {
     player.move_right = false;
@@ -118,7 +129,7 @@
 
   tgame.addKeyControl(tgame.keyboard.F, function() {
     checkStartPressed();
-    tgame.toggleFullscreen();  
+    tgame.toggleFullscreen();
   });
 
   tgame.addKeyControl(tgame.keyboard.SPACE, function() {
@@ -126,6 +137,7 @@
       return;
     }
 
+    using_gamepad = false;
     if (!player.jumping && player.onplatform) {
       player.jump = true;
       player.jumping = true;
@@ -137,11 +149,46 @@
   tgame.addKeyControl(tgame.keyboard.R, function(event) {
     if (event.ctrlKey) return false;
 
-    game_over_message.hidden = true;
-    score_message.hidden = true;
-    hi_score_message.hidden = true;
-    restart_message.hidden = true;
-    tgame.state = "CLEAR_ROUND";
+    using_gamepad = false;
+    restart();
+  });
+
+  tgame.gamepad(function(g) {
+    if (!player) {
+      return;
+    }
+
+    var move_right = g.left_stick.x > 0.5 || g.dpad.x > 0.5;
+    var move_left = g.left_stick.x < -0.5 || g.dpad.x < -0.5;
+
+    if (move_left || move_right) {
+      using_gamepad = true;
+    }
+
+    if (using_gamepad) {
+      player.move_left = move_left;
+      player.move_right = move_right;
+    }
+
+    if (g.a.down && g.a.changed) {
+      using_gamepad = true;
+      if (!player.jumping && player.onplatform) {
+        player.jump = true;
+        player.jumping = true;
+      }
+    } else {
+      player.jumping = false;
+    }
+
+    if (g.start.down && g.start.changed) {
+      using_gamepad = true;
+      restart();
+    }
+
+    if (g.select.down && g.select.changed) {
+      using_gamepad = false;
+      tgame.toggleFullscreen();
+    }
   });
 
   tgame.addSound("music", "audio/bellahmer-round1");
@@ -184,6 +231,16 @@
         world.bottom - FLOOR_HEIGHT
       )
       );
+    }
+  }
+
+  function updateInputMessages() {
+    if (using_gamepad) {
+      jump_message.text = GAMEPAD_JUMP_TEXT;
+      restart_message.text = GAMEPAD_RESTART_TEXT;
+    } else {
+      jump_message.text = KEYBOARD_JUMP_TEXT;
+      restart_message.text = KEYBOARD_RESTART_TEXT;
     }
   }
 
@@ -244,7 +301,7 @@
     },
     TITLE: function() {
       var author_message, music_message;
-      var controls_message, jump_message;
+      var controls_message;
 
       author_message = createMessage({
         x: title_message.x,
@@ -281,7 +338,7 @@
         baseline: "bottom",
         text_align: "right",
         hidden: true,
-        text: "SPACE to Jump"
+        text: KEYBOARD_JUMP_TEXT
       });
 
       tgame.entities.messages.push(title_message);
@@ -409,7 +466,7 @@
         y: game_over_message.y + 88,
         font: "normal 18px telegrama",
         baseline: "top",
-        text: "Press 'R' to Restart",
+        text: KEYBOARD_RESTART_TEXT,
         text_align: "center",
         hidden: true
       });
@@ -426,6 +483,9 @@
 
     PLAY: function(dt) {
       var df = dt * MS_TO_FRAMES;
+
+      updateInputMessages();
+
       var collisions = {};
 
       player.last_x = player.x;
