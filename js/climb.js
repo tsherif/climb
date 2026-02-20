@@ -21,6 +21,7 @@
   "use strict";
 
   var canvas = document.getElementById("canvas");
+  canvas.style.cursor = 'none';
 
   var WORLD_WIDTH = 800;
   var WORLD_HEIGHT = 600;
@@ -158,8 +159,8 @@
       return;
     }
 
-    var move_right = g.left_stick.x > 0.5 || g.dpad.right;
-    var move_left = g.left_stick.x < -0.5 || g.dpad.left;
+    var move_right = g.left_stick.x > 0.5 || g.dpad.right.down;
+    var move_left = g.left_stick.x < -0.5 || g.dpad.left.down;
 
     if (move_left || move_right) {
       using_gamepad = true;
