@@ -158,8 +158,8 @@
       return;
     }
 
-    var move_right = g.left_stick.x > 0.5 || g.dpad.x > 0.5;
-    var move_left = g.left_stick.x < -0.5 || g.dpad.x < -0.5;
+    var move_right = g.left_stick.x > 0.5 || g.dpad.right;
+    var move_left = g.left_stick.x < -0.5 || g.dpad.left;
 
     if (move_left || move_right) {
       using_gamepad = true;
@@ -183,11 +183,6 @@
     if (g.start.down && g.start.changed) {
       using_gamepad = true;
       restart();
-    }
-
-    if (g.select.down && g.select.changed) {
-      using_gamepad = false;
-      tgame.toggleFullscreen();
     }
   });
 
