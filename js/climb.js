@@ -112,20 +112,30 @@
 
   window.addEventListener("resize", calculateProjection);
 
+  tgame.setTimeStep(1000 / 40);
+
   tgame.setRenderOrder(["walls", "platforms", "player", "messages"]);
 
   tgame.addKeyControl(tgame.keyboard.LEFT, function() {
     using_gamepad = false;
-    player.move_left = true;
+    if (player) {
+      player.move_left = true;
+    }
   }, function() {
-    player.move_left = false;
+    if (player) {
+      player.move_left = false;
+    }
   });
 
   tgame.addKeyControl(tgame.keyboard.RIGHT, function() {
     using_gamepad = false;
-    player.move_right = true;
+    if (player) {
+      player.move_right = true;
+    }
   }, function() {
-    player.move_right = false;
+    if (player) {
+      player.move_right = false;
+    }
   });
 
   tgame.addKeyControl(tgame.keyboard.F, function() {
